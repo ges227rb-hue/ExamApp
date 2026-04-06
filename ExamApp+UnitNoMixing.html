@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BISE Exam Master Pro v6.3 | GES 227 RB Style</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700;800&family=Noto+Sans+Arabic:wght@400;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #1e4a76;
+            --primary-dark: #0f3b5c;
+            --secondary: #475569;
+            --accent: #0d9488;
+            --danger: #dc2626;
+            --surface: #ffffff;
+            --bg: #f0f4f8;
+            --border-light: #cbd5e1;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg);
+            color: #0f172a;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.94);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(3px);
+        }
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .lang-ur {
+            font-family: 'Noto Nastaliq Urdu', serif;
+            line-height: 2.2;
+            direction: rtl;
+            text-align: right;
+            font-size: 1rem;
+        }
+        .lang-en {
+            font-family: 'Roboto', sans-serif;
+            direction: ltr;
+            text-align: left;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px 18px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .container {
+            padding: 16px;
+            max-width: 620px;
+            margin: 0 auto;
+            padding-bottom: 85px;
+        }
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .field-group {
+            margin-bottom: 14px;
+        }
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 12px;
+            border: 1.5px solid var(--border-light);
+            border-radius: 14px;
+            font-size: 14px;
+            background: #fefefe;
+            transition: 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30,74,118,0.2);
+        }
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            width: 100%;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .btn-main:hover { background: var(--primary-dark); transform: scale(0.98); }
+        .btn-danger {
+            background: var(--danger);
+        }
+        .btn-danger:hover { background: #b91c1c; }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 16px;
+        }
+        .stat-item {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e293b;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            padding: 8px 0 12px;
+            z-index: 1000;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .nav-item.active {
+            color: var(--primary);
+        }
+        .nav-item i {
+            font-size: 22px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        #paper-preview-area {
+            background: #e2e8f0;
+            padding: 20px 10px;
+            min-height: 100vh;
+        }
+        .pdf-page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 12mm 15mm;
+            margin: 0 auto 12px auto;
+            position: relative;
+            color: black;
+            font-family: 'Times New Roman', 'Noto Nastaliq Urdu', serif;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            break-inside: avoid;
+        }
+        .page-break {
+            page-break-before: always;
+            margin-top: 10px;
+        }
+        .bise-header-box {
+            border: 2px solid #1e293b;
+            padding: 14px 12px;
+            margin-bottom: 20px;
+            position: relative;
+            text-align: center;
+            background: #fefce8;
+            border-radius: 8px;
+        }
+        .header-logo {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            max-height: 70px;
+            max-width: 70px;
+            object-fit: contain;
+        }
+        .header-marks {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            border: 1px solid #000;
+            padding: 5px 12px;
+            font-weight: bold;
+            font-size: 13px;
+            background: white;
+            border-radius: 30px;
+        }
+        .school-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .student-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 1px dashed #cbd5e1;
+            padding-bottom: 8px;
+        }
+        .info-under {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            min-width: 170px;
+            height: 20px;
+            vertical-align: middle;
+        }
+        .part-title {
+            background: #f1f5f9;
+            border-left: 5px solid var(--primary);
+            text-align: center;
+            font-weight: 800;
+            padding: 8px;
+            margin: 20px 0 12px 0;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        .instruction {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            background: #fef9e3;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+        .q-row {
+            display: flex;
+            margin-bottom: 16px;
+            break-inside: avoid;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .q-num {
+            min-width: 45px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .q-body {
+            flex: 1;
+        }
+        .opt-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            background: #fafcff;
+            padding: 6px;
+            border-radius: 12px;
+        }
+        footer.pdf-footer {
+            position: absolute;
+            bottom: 12mm;
+            left: 15mm;
+            right: 15mm;
+            border-top: 1px solid #aaa;
+            text-align: center;
+            font-size: 10px;
+            padding-top: 6px;
+            color: #334155;
+        }
+        .answer-key-section {
+            margin-top: 20px;
+            border-top: 2px dashed #334155;
+            padding-top: 15px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .mixing-unit-row {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        .btn-icon-small {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-content, #print-content * {
+                visibility: visible;
+            }
+            #print-content {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+            }
+            .no-print { display: none; }
+            .pdf-page { margin: 0; box-shadow: none; page-break-after: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader-overlay"><div class="spinner"></div><div style="margin-top:15px; font-weight:bold;">Processing...</div></div>
+
+<!-- PIN Auth Screen -->
+<div id="scr-auth" class="fade-in" style="position:fixed; inset:0; background:#fff; z-index:9000; display:flex; align-items:center; justify-content:center;">
+    <div class="card" style="width: 85%; max-width: 380px; text-align: center;">
+        <i class="fas fa-chalkboard-user fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
+        <h2>📚 BISE Exam Portal</h2>
+        <p style="margin:10px 0;">Secure Access</p>
+        <input id="pin-entry" type="password" placeholder="PIN: 786605" style="margin-top:20px; text-align:center; font-size:20px; letter-spacing:5px;">
+        <button onclick="handleLogin()" class="btn-main" style="margin-top:20px;"><i class="fas fa-key"></i> Enter Dashboard</button>
+    </div>
+</div>
+
+<div id="app-body" class="hidden">
+    <header>
+        <div style="font-weight:800; font-size:1.2rem;">📖 GES 227 EXAM MASTER v6.3</div>
+        <button onclick="location.reload()" style="background:none; border:none; color:white; font-size:1.3rem;"><i class="fas fa-power-off"></i></button>
+    </header>
+
+    <div class="container">
+        <!-- GENERATE SECTION -->
+        <section id="sec-gen" class="fade-in">
+            <div class="card">
+                <h3><i class="fas fa-sliders-h"></i> Paper Settings</h3>
+                <div class="field-group"><label>📘 Class</label><select id="g-class"></select></div>
+                <div class="field-group"><label>📖 Subject</label><select id="g-sub"></select></div>
+                <div class="field-group"><label>🔍 Topic / Chapter Filter</label><input id="g-top" type="text" placeholder="e.g., زراعت، کپاس، Wheat"></div>
+                <div class="field-group"><label>🌐 Language</label><select id="g-lang"><option value="Ur">اردو (Urdu)</option><option value="Eng">English</option></select></div>
+                
+                <!-- Mixing Mode Dropdown -->
+                <div class="field-group"><label>🔄 Question Mixing Mode</label><select id="mixing-mode"><option value="without">Without Mixing (Standard)</option><option value="with">With Mixing (Unit-wise Selection)</option></select></div>
+                
+                <div id="standard-fields">
+                    <label>📊 Question Distribution & Marks</label>
+                    <div class="grid-2col">
+                        <div class="field-group"><label>MCQs Qty</label><input id="q-m-n" type="number" value="12"></div>
+                        <div class="field-group"><label>Marks/MCQ</label><input id="q-m-m" type="number" value="1"></div>
+                        <div class="field-group"><label>Short Qty</label><input id="q-s-n" type="number" value="5"></div>
+                        <div class="field-group"><label>Marks/Short</label><input id="q-s-m" type="number" value="2"></div>
+                        <div class="field-group"><label>Long Qty</label><input id="q-l-n" type="number" value="2"></div>
+                        <div class="field-group"><label>Marks/Long</label><input id="q-l-m" type="number" value="5"></div>
+                    </div>
+                </div>
+                
+                <!-- Mixing Dynamic Panel -->
+                <div id="mixing-fields" class="hidden">
+                    <div class="field-group"><label>📌 Select Unit Numbers & Define Counts (Units auto-populated from selected Class+Subject)</label></div>
+                    <div id="mixing-units-container"></div>
+                    <button type="button" onclick="addUnitRow()" class="btn-icon-small" style="margin-top: 6px; background: var(--accent);"><i class="fas fa-plus-circle"></i> Add Unit</button>
+                    <div class="field-group" style="margin-top:12px;"><label>💰 Marks per Question Type (Global)</label></div>
+                    <div class="grid-2col">
+                        <div class="field-group"><label>Marks/MCQ</label><input id="mix-m-m" type="number" value="1"></div>
+                        <div class="field-group"><label>Marks/Short</label><input id="mix-s-m" type="number" value="2"></div>
+                        <div class="field-group"><label>Marks/Long</label><input id="mix-l-m" type="number" value="5"></div>
+                    </div>
+                </div>
+                
+                <button onclick="generatePaper()" class="btn-main"><i class="fas fa-magic"></i> Generate Paper 📄</button>
+            </div>
+        </section>
+
+        <!-- ADMIN SECTION -->
+        <section id="sec-admin" class="hidden fade-in">
+            <div class="card">
+                <h3>🏫 School Branding & Instructions</h3>
+                <div class="field-group"><label>📸 School Logo</label><input type="file" accept="image/*" onchange="uploadLogo(this)"><div id="logo-status" style="font-size:12px;"></div></div>
+                <div class="field-group"><label>🏛️ School Name</label><input id="c-name" type="text" placeholder="Superior Public School"></div>
+                <div class="field-group"><label>📅 Exam Title</label><input id="c-exam" type="text" placeholder="Annual Examination 2026"></div>
+                <div class="field-group"><label>📍 Address / Footer</label><input id="c-addr" type="text" placeholder="Pakistan"></div>
+            </div>
+            <div class="card">
+                <h3>📂 Data Management</h3>
+                <div class="grid-2col">
+                    <label class="btn-main" style="background:var(--accent); cursor:pointer;"><i class="fas fa-file-excel"></i> Import Excel <input type="file" id="excel-file" accept=".xlsx, .xls" style="display:none;" onchange="handleExcel(this)"></label>
+                    <button onclick="exportData()" class="btn-main" style="background:#2c3e66;"><i class="fas fa-database"></i> Backup JSON</button>
+                </div>
+                <div id="db-stats" class="stat-grid"></div>
+                <div class="grid-2col" style="margin-top: 12px;">
+                    <button onclick="loadSampleData()" class="btn-main" style="background:#4b5563;"><i class="fas fa-flask"></i> Load Sample Data</button>
+                    <button onclick="clearQuestionBank()" class="btn-main btn-danger" style="background:var(--danger);"><i class="fas fa-trash-alt"></i> Clear Question Bank</button>
+                </div>
+                <p style="font-size: 11px; margin-top: 8px; color: #64748b; text-align: center;">⚠️ Clear button will erase all MCQs & Theory questions. Settings remain saved.</p>
+            </div>
+            <div class="card">
+                <h3>📝 Instructions Editor (Urdu / English)</h3>
+                <div class="grid-2col">
+                    <textarea id="i-mu" rows="2" placeholder="مقصدی ہدایات اردو"></textarea>
+                    <textarea id="i-me" rows="2" placeholder="Objective Instructions Eng"></textarea>
+                    <textarea id="i-su" rows="2" placeholder="مختصر جوابات ہدایات"></textarea>
+                    <textarea id="i-se" rows="2" placeholder="Short answer instructions"></textarea>
+                    <textarea id="i-lu" rows="2" placeholder="تفصیلی جوابات ہدایات"></textarea>
+                    <textarea id="i-le" rows="2" placeholder="Detailed answer instructions"></textarea>
+                </div>
+                <button onclick="saveCfg()" class="btn-main" style="background:#0f3b5c; margin-top:8px;"><i class="fas fa-save"></i> Save Settings</button>
+            </div>
+        </section>
+
+        <!-- PREVIEW SECTION -->
+        <section id="sec-prev" class="hidden">
+            <div class="no-print" style="margin-bottom:15px; display:flex; gap:12px;">
+                <button onclick="navTo('gen')" class="btn-main" style="background:var(--secondary);"><i class="fas fa-edit"></i> Back to Edit</button>
+                <button onclick="savePDF()" class="btn-main" style="background:var(--accent);"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                <button onclick="window.print()" class="btn-main" style="background:#2c3e66;"><i class="fas fa-print"></i> Print</button>
+            </div>
+            <div id="paper-preview-area"><div id="print-content"></div></div>
+        </section>
+    </div>
+
+    <nav class="no-print">
+        <a href="javascript:void(0)" onclick="navTo('gen')" class="nav-item active" id="n-gen"><i class="fas fa-plus-circle"></i>GENERATE</a>
+        <a href="javascript:void(0)" onclick="navTo('admin')" class="nav-item" id="n-admin"><i class="fas fa-sliders-h"></i>ADMIN</a>
+        <a href="javascript:void(0)" onclick="navTo('prev')" class="nav-item" id="n-prev"><i class="fas fa-eye"></i>PREVIEW</a>
+    </nav>
+</div>
+
+<script>
+    // ---------- Use IndexedDB to avoid storage quota errors ----------
+    const DB_NAME = 'ExamMasterDB';
+    const DB_VERSION = 1;
+    let dbInstance = null;
+    let currentData = { mcqs: [], theory: [] };  // in-memory cache
+    
+    // Global config
+    let cfg = { 
+        name: "GES 227 Public School", 
+        exam: "Annual Examination 2026", 
+        addr: "Pakistan, Board of Intermediate & Secondary Education",
+        logo: "",
+        ins: { mu: "درست آپشن کا انتخاب کریں۔ ہر سوال کے چار ممکنہ جوابات ہیں۔", me: "Choose the correct option. Each question carries 1 mark.", su: "مختصر جوابات تحریر کریں۔ کم از کم تین سطریں۔", se: "Write short answers (2-3 lines each).", lu: "تفصیلی جوابات تحریر کریں۔", le: "Write detailed answers with explanation." }
+    };
+    
+    // Mixing UI rows: each stores unitNumber (string), mcq, short, long
+    let unitRows = [];
+    
+    // Function to get distinct unit numbers based on selected class & subject from currentData
+    function getAvailableUnits() {
+        const classVal = document.getElementById('g-class').value;
+        const subVal = document.getElementById('g-sub').value;
+        if(!classVal || classVal === "- No Data -" || !subVal || subVal === "- No Data -") return [];
+        const allQuestions = [...currentData.mcqs, ...currentData.theory];
+        const filtered = allQuestions.filter(q => q.class == classVal && q.sub == subVal);
+        const unitsSet = new Set();
+        filtered.forEach(q => { if(q.unit && q.unit.toString().trim() !== "") unitsSet.add(q.unit.toString().trim()); });
+        return Array.from(unitsSet).sort();
+    }
+    
+    // Refresh mixing UI dropdowns based on selected class/subject
+    function refreshMixingUI() {
+        const container = document.getElementById('mixing-units-container');
+        if(!container) return;
+        const availableUnits = getAvailableUnits();
+        container.innerHTML = '';
+        unitRows.forEach((row, idx) => {
+            const div = document.createElement('div');
+            div.className = 'mixing-unit-row';
+            // Create select dropdown with available units
+            let optionsHtml = '<option value="">-- Select Unit --</option>';
+            availableUnits.forEach(unit => {
+                const selected = (row.unitNumber === unit) ? 'selected' : '';
+                optionsHtml += `<option value="${escapeHtml(unit)}" ${selected}>${escapeHtml(unit)}</option>`;
+            });
+            div.innerHTML = `
+                <div class="grid-2col" style="margin-bottom:8px;">
+                    <div class="field-group"><label>Unit Number</label><select class="unit-select" data-idx="${idx}">${optionsHtml}</select></div>
+                    <div class="field-group"><label>MCQs</label><input type="number" class="unit-mcq" value="${row.mcq}" min="0" step="1" style="font-size:13px;"></div>
+                    <div class="field-group"><label>Short Qs</label><input type="number" class="unit-short" value="${row.short}" min="0" step="1" style="font-size:13px;"></div>
+                    <div class="field-group"><label>Long Qs</label><input type="number" class="unit-long" value="${row.long}" min="0" step="1" style="font-size:13px;"></div>
+                </div>
+                <button type="button" onclick="removeUnitRow(${idx})" style="background:#dc2626; border:none; color:white; padding:4px 12px; border-radius:40px; font-size:11px;"><i class="fas fa-trash"></i> Remove</button>
+            `;
+            container.appendChild(div);
+        });
+        // attach event listeners after DOM update
+        document.querySelectorAll('.unit-select').forEach(sel => {
+            const idx = parseInt(sel.getAttribute('data-idx'));
+            sel.addEventListener('change', (e) => { if(unitRows[idx]) unitRows[idx].unitNumber = e.target.value; });
+        });
+        document.querySelectorAll('.unit-mcq').forEach((inp, i) => inp.addEventListener('change', (e) => { unitRows[i].mcq = parseInt(e.target.value) || 0; }));
+        document.querySelectorAll('.unit-short').forEach((inp, i) => inp.addEventListener('change', (e) => { unitRows[i].short = parseInt(e.target.value) || 0; }));
+        document.querySelectorAll('.unit-long').forEach((inp, i) => inp.addEventListener('change', (e) => { unitRows[i].long = parseInt(e.target.value) || 0; }));
+    }
+    
+    function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function addUnitRow() { unitRows.push({ unitNumber: "", mcq: 0, short: 0, long: 0 }); refreshMixingUI(); }
+    function removeUnitRow(idx) { unitRows.splice(idx, 1); refreshMixingUI(); }
+    
+    // Listen to class/subject changes to update unit dropdowns in mixing mode
+    function attachClassSubjectListeners() {
+        const classSelect = document.getElementById('g-class');
+        const subSelect = document.getElementById('g-sub');
+        const updateUnits = () => {
+            if(document.getElementById('mixing-mode').value === 'with') {
+                refreshMixingUI();
+            }
+        };
+        classSelect.addEventListener('change', updateUnits);
+        subSelect.addEventListener('change', updateUnits);
+    }
+    
+    // IndexedDB functions same as original
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = (e) => { console.error("IndexedDB error", e); reject(e); };
+            request.onsuccess = (e) => { dbInstance = e.target.result; resolve(dbInstance); };
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('questionBank')) {
+                    const store = db.createObjectStore('questionBank', { keyPath: 'id' });
+                    store.createIndex('type', 'type', { unique: false });
+                }
+            };
+        });
+    }
+    
+    async function saveToIndexedDB(data) {
+        if (!dbInstance) await initDB();
+        const transaction = dbInstance.transaction(['questionBank'], 'readwrite');
+        const store = transaction.objectStore('questionBank');
+        await store.clear();
+        const mcqsWithType = data.mcqs.map((q, idx) => ({ ...q, type: 'mcq', id: `mcq_${Date.now()}_${idx}_${Math.random()}` }));
+        const theoryWithType = data.theory.map((q, idx) => ({ ...q, type: 'theory', id: `theory_${Date.now()}_${idx}_${Math.random()}` }));
+        for (const item of [...mcqsWithType, ...theoryWithType]) { store.put(item); }
+        return new Promise((resolve, reject) => { transaction.oncomplete = () => resolve(); transaction.onerror = (e) => reject(e); });
+    }
+    
+    async function loadFromIndexedDB() {
+        if (!dbInstance) await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = dbInstance.transaction(['questionBank'], 'readonly');
+            const store = transaction.objectStore('questionBank');
+            const request = store.getAll();
+            request.onsuccess = () => {
+                const items = request.result || [];
+                const mcqs = items.filter(i => i.type === 'mcq').map(({ id, type, ...rest }) => rest);
+                const theory = items.filter(i => i.type === 'theory').map(({ id, type, ...rest }) => rest);
+                resolve({ mcqs, theory });
+            };
+            request.onerror = (e) => reject(e);
+        });
+    }
+    
+    async function clearIndexedDB() {
+        if (!dbInstance) await initDB();
+        const transaction = dbInstance.transaction(['questionBank'], 'readwrite');
+        const store = transaction.objectStore('questionBank');
+        store.clear();
+        return new Promise((resolve, reject) => { transaction.oncomplete = () => resolve(); transaction.onerror = (e) => reject(e); });
+    }
+    
+    async function loadSampleData() {
+        if(confirm("Load sample question bank? This will replace current data.")) {
+            toggleLoader(true);
+            const sampleDB = {
+                mcqs: [
+                    { class:"8", sub:"زرعی تعلیم", unit:"1", top:"گندم", lang:"Ur", q:"گندم کی کاشت کا بہترین وقت کیا ہے؟", a:"15 اپریل تا 15 مئی", b:"15 مارچ تا 15 اپریل", c:"15 فروری تا 15 مارچ", d:"دسمبر", k:"C" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"2", top:"کپاس", lang:"Ur", q:"کپاس کی ترقی یافتہ اقسام میں شامل ہے؟", a:"چناب 557", b:"ایکم این", c:"تمام مذکورہ", d:"نہیں", k:"C" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"3", top:"مکئی", lang:"Ur", q:"خریف کی فصلیں کب کاشت ہوتی ہیں؟", a:"موسم سرما", b:"موسم بہار", c:"موسم گرما کے شروع میں", d:"موسم خزاں", k:"C" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"4", top:"زمین", lang:"Ur", q:"زمین کی پیمائش کا بنیادی پیمانہ کیا ہے؟", a:"کرا", b:"بسکہ", c:"ایکڑ", d:"مربع فٹ", k:"A" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"1", top:"پانی", lang:"Ur", q:"گندم کی بہتر پیداوار کے لیے ہلکی پانی کب دینا چاہیے؟", a:"3-5 دن بعد", b:"12-18 دن بعد", c:"20-25 دن بعد", d:"30 دن بعد", k:"B" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"5", top:"چاول", lang:"Ur", q:"دھان کی کاشت کے لیے کھاد کی مقدار کتنی ہے؟", a:"60-70 کلو فی ایکڑ", b:"50-60 کلو فی ایکڑ", c:"40-50 کلو فی ایکڑ", d:"30-40", k:"B" }
+                ],
+                theory: [
+                    { class:"8", sub:"زرعی تعلیم", unit:"1", top:"گندم", lang:"Ur", q:"گندم کی کاشت کے لیے زمین کی تیاری کے طریقے بیان کریں۔", k:"زمین کو ہل چلا کر نرم کیا جائے، پھر سہاگہ دے کر برابر کیا جائے۔" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"2", top:"ترقی", lang:"Ur", q:"کپاس کی جدید اقسام کے نام اور خصوصیات لکھیں۔", k:"چناب 557، ایکم این" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"4", top:"اقسام", lang:"Ur", q:"زمین کی تین اقسام لکھیں۔", k:"ریتلی زمین، چکنی زمین، لومی زمین۔" },
+                    { class:"8", sub:"زرعی تعلیم", unit:"5", top:"دھان", lang:"Ur", q:"دھان کی کاشت کے لیے کھاد کی مقدار اور طریقہ بتائیں۔", k:"50-60 کلو فی ایکڑ" }
+                ]
+            };
+            await saveToIndexedDB(sampleDB);
+            currentData = sampleDB;
+            await updateStatsAndDropdowns();
+            toggleLoader(false);
+            alert("✅ Sample data loaded with unit numbers 1,2,3,4,5");
+        }
+    }
+    
+    async function clearQuestionBank() {
+        if(confirm("⚠️ WARNING: This will permanently DELETE all questions. Are you sure?")) {
+            toggleLoader(true);
+            await clearIndexedDB();
+            currentData = { mcqs: [], theory: [] };
+            await updateStatsAndDropdowns();
+            toggleLoader(false);
+            alert("✅ Question bank cleared!");
+        }
+    }
+    
+    async function updateStatsAndDropdowns() {
+        document.getElementById('db-stats').innerHTML = `<div class="stat-item">📚 MCQs: ${currentData.mcqs.length}</div><div class="stat-item">📝 Theory: ${currentData.theory.length}</div><div class="stat-item">🏷️ Classes: ${new Set([...currentData.mcqs,...currentData.theory].map(x=>x.class)).size}</div><div class="stat-item">📖 Subjects: ${new Set([...currentData.mcqs,...currentData.theory].map(x=>x.sub)).size}</div>`;
+        const all = [...currentData.mcqs, ...currentData.theory];
+        const cls = [...new Set(all.map(x=>x.class))];
+        const sub = [...new Set(all.map(x=>x.sub))];
+        const classSelect = document.getElementById('g-class');
+        const subSelect = document.getElementById('g-sub');
+        if(cls.length) classSelect.innerHTML = cls.map(c=>`<option>${c}</option>`).join('');
+        else classSelect.innerHTML = '<option>- No Data -</option>';
+        if(sub.length) subSelect.innerHTML = sub.map(s=>`<option>${s}</option>`).join('');
+        else subSelect.innerHTML = '<option>- No Data -</option>';
+        // refresh mixing ui if needed
+        if(document.getElementById('mixing-mode').value === 'with') refreshMixingUI();
+    }
+    
+    async function handleExcel(input) {
+        const file = input.files[0];
+        if(!file) return;
+        toggleLoader(true);
+        const r = new FileReader();
+        r.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                let newMcqs = [], newTheory = [];
+                for(let i=1; i<rows.length; i++) {
+                    let row = rows[i];
+                    if(!row[5]) continue;
+                    let item = { class:row[1]||"8", sub:row[2]||"زرعی تعلیم", unit:row[3]||"", top:row[4]||"", lang:row[0]||"Ur", q:row[5] };
+                    if(row[6] && row[7] && row[8] && row[9]) {
+                        item.a=row[6]; item.b=row[7]; item.c=row[8]; item.d=row[9]; item.k=row[10]||"A";
+                        newMcqs.push(item);
+                    } else {
+                        item.k=row[6] || "جواب محفوظ";
+                        newTheory.push(item);
+                    }
+                }
+                const newDB = { mcqs: newMcqs, theory: newTheory };
+                await saveToIndexedDB(newDB);
+                currentData = newDB;
+                await updateStatsAndDropdowns();
+                alert(`Imported ${newMcqs.length} MCQs & ${newTheory.length} Theory Qs.`);
+            } catch(err) { alert("Excel error: "+err.message); }
+            toggleLoader(false);
+        };
+        r.readAsArrayBuffer(file);
+    }
+    
+    async function exportData() {
+        const dataStr = JSON.stringify(currentData, null, 2);
+        const blob = new Blob([dataStr], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'ExamDB_Backup.json';
+        a.click();
+    }
+    
+    // MIXING LOGIC based on unitNumber
+    async function generateWithMixing(f) {
+        const rowsValid = unitRows.filter(r => r.unitNumber && r.unitNumber.trim() !== "" && (r.mcq>0 || r.short>0 || r.long>0));
+        if(rowsValid.length === 0) throw new Error("Add at least one valid unit with positive question counts.");
+        const mcqMark = parseInt(document.getElementById('mix-m-m').value) || 1;
+        const shortMark = parseInt(document.getElementById('mix-s-m').value) || 2;
+        const longMark = parseInt(document.getElementById('mix-l-m').value) || 5;
+        let selectedMcqs = [], selectedShort = [], selectedLong = [];
+        for(const ru of rowsValid) {
+            const unitFilter = (item) => item.class == f.cls && item.sub == f.sub && item.unit && item.unit.toString().trim() === ru.unitNumber.trim();
+            const mcqPool = shuffle(currentData.mcqs.filter(unitFilter));
+            const theoryPool = shuffle(currentData.theory.filter(unitFilter));
+            selectedMcqs.push(...mcqPool.slice(0, ru.mcq));
+            selectedShort.push(...theoryPool.slice(0, ru.short));
+            selectedLong.push(...theoryPool.slice(ru.short, ru.short + ru.long));
+        }
+        if(selectedMcqs.length===0 && selectedShort.length===0 && selectedLong.length===0) throw new Error("No questions found for selected units.");
+        const finalMcqs = selectedMcqs.slice(0, rowsValid.reduce((s,r)=>s+r.mcq,0));
+        const finalShorts = selectedShort.slice(0, rowsValid.reduce((s,r)=>s+r.short,0));
+        const finalLongs = selectedLong.slice(0, rowsValid.reduce((s,r)=>s+r.long,0));
+        renderPaperPDF({...f, mM: mcqMark, sM: shortMark, lM: longMark}, finalMcqs, finalShorts, finalLongs);
+    }
+    
+    async function generatePaper() {
+        toggleLoader(true);
+        await new Promise(r=>setTimeout(r, 200));
+        const mode = document.getElementById('mixing-mode').value;
+        const f = {
+            cls: document.getElementById('g-class').value,
+            sub: document.getElementById('g-sub').value,
+            lang: document.getElementById('g-lang').value,
+            top: document.getElementById('g-top').value.trim().toLowerCase(),
+        };
+        if(f.cls === "- No Data -" || f.sub === "- No Data -" || (currentData.mcqs.length===0 && currentData.theory.length===0)) {
+            toggleLoader(false);
+            alert("No question bank available! Please import Excel or load sample data from Admin panel.");
+            return;
+        }
+        try {
+            if(mode === "without") {
+                const qtyM = +document.getElementById('q-m-n').value, mM = +document.getElementById('q-m-m').value;
+                const qtyS = +document.getElementById('q-s-n').value, sM = +document.getElementById('q-s-m').value;
+                const qtyL = +document.getElementById('q-l-n').value, lM = +document.getElementById('q-l-m').value;
+                const filter = (item) => item.class == f.cls && item.sub == f.sub && (f.top === "" || (item.top && item.top.toLowerCase().includes(f.top)) || (item.q && item.q.toLowerCase().includes(f.top)));
+                const mcqPool = shuffle(currentData.mcqs.filter(filter));
+                const theoryPool = shuffle(currentData.theory.filter(filter));
+                const mcqs = mcqPool.slice(0, qtyM);
+                const shorts = theoryPool.slice(0, qtyS);
+                const longs = theoryPool.slice(qtyS, qtyS + qtyL);
+                if(mcqs.length===0 && shorts.length===0 && longs.length===0) { throw new Error("No questions found."); }
+                renderPaperPDF({...f, mM, sM, lM, qtyM, qtyS, qtyL}, mcqs, shorts, longs);
+            } else {
+                await generateWithMixing(f);
+            }
+            navTo('prev');
+            if(window.MathJax) MathJax.typesetPromise();
+        } catch(err) { alert("Generation Error: "+err.message); }
+        toggleLoader(false);
+    }
+    
+    function renderPaperPDF(f, mcqs, shorts, longs) {
+        const total = (mcqs.length * f.mM) + (shorts.length * f.sM) + (longs.length * f.lM);
+        const langClass = f.lang === 'Ur' ? 'lang-ur' : 'lang-en';
+        const getIns = (type) => f.lang === 'Ur' ? cfg.ins[type+'u'] : cfg.ins[type+'e'];
+        let html = `<div class="pdf-page"><div class="bise-header-box">${cfg.logo ? `<img src="${cfg.logo}" class="header-logo">` : ''}<div class="header-marks">کل نمبر / Total: ${total}</div><div class="school-title">${cfg.name}</div><div style="font-weight:bold; font-size:1rem;">${cfg.exam}</div><div style="font-size:13px; margin-top:6px;">مضمون: ${f.sub} | جماعت: ${f.cls}</div><div style="font-size:12px;">وقت: 2:30 گھنٹے</div></div><div class="student-info-row"><div>طالب علم کا نام: <span class="info-under"></span></div><div>رول نمبر: <span class="info-under" style="min-width:120px;"></span></div></div>`;
+        if(mcqs.length){
+            html += `<div class="part-title">📌 حصہ اول - معروضی (Objective)</div><div class="instruction ${langClass}">${getIns('m')}</div>`;
+            mcqs.forEach((q,idx)=>{ html += `<div class="q-row ${langClass}"><div class="q-num">${idx+1}.</div><div class="q-body">${q.q}<div class="opt-grid"><span>A) ${q.a||'--'}</span><span>B) ${q.b||'--'}</span><span>C) ${q.c||'--'}</span><span>D) ${q.d||'--'}</span></div></div><div style="font-weight:bold;">(${f.mM})</div></div>`; });
+        }
+        html += `<div class="part-title">✍️ حصہ دوم - انشائیہ (Subjective)</div>`;
+        if(shorts.length){ html += `<div class="instruction ${langClass}">${getIns('s')}</div>`; shorts.forEach((q,i)=> html += `<div class="q-row ${langClass}"><div class="q-num">${i+1}.</div><div class="q-body">${q.q}</div><div style="font-weight:bold;">(${f.sM})</div></div>`); }
+        if(longs.length){ html += `<div class="instruction ${langClass}" style="margin-top:10px;">${getIns('l')}</div>`; longs.forEach((q,i)=> html += `<div class="q-row ${langClass}"><div class="q-num">تفصیلی سوال ${i+1}:</div><div class="q-body">${q.q}</div><div style="font-weight:bold;">(${f.lM})</div></div>`); }
+        html += `<footer class="pdf-footer">${cfg.addr}</footer></div><div class="pdf-page page-break"><div class="bise-header-box"><div class="school-title">🔐 جوابی کلید / ANSWER KEY</div><div>${f.sub} - جماعت ${f.cls}</div></div><div style="direction:${f.lang==='Ur'?'rtl':'ltr'}"><div style="font-weight:bold;">✅ معروضی جوابات:</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:15px 0;">${mcqs.map((q,i)=>`<div style="border:1px solid #ccc; padding:5px; text-align:center;">Q${i+1}: <b>${q.k}</b></div>`).join('')}</div>`;
+        if([...shorts,...longs].length){ html += `<div style="font-weight:bold; margin-top:20px;">📖 مختصر / تفصیلی جوابات کے لیے رہنما خطوط:</div>`; [...shorts,...longs].forEach((q,i)=> html += `<div style="font-size:12px; margin:8px 0; border-bottom:1px dotted #ddd;"><strong>Q${i+1}:</strong> ${q.k.substring(0,180)}${q.k.length>180?'...':''}</div>`); }
+        html += `</div></div>`;
+        document.getElementById('print-content').innerHTML = html;
+        window.lastMeta = f;
+    }
+    
+    async function savePDF() {
+        toggleLoader(true);
+        const element = document.getElementById('print-content');
+        const opt = { margin: [0.5,0.5,0.5,0.5], filename: `Exam_${window.lastMeta?.cls || 'Paper'}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'], before: '.page-break' } };
+        html2pdf().set(opt).from(element).save().then(()=>toggleLoader(false));
+    }
+    
+    function navTo(id) { ['gen','admin','prev'].forEach(s=>document.getElementById('sec-'+s).classList.add('hidden')); document.getElementById('sec-'+id).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(t=>t.classList.remove('active')); document.getElementById('n-'+id).classList.add('active'); }
+    function toggleLoader(show) { document.getElementById('loader-overlay').style.display = show ? 'flex' : 'none'; }
+    function shuffle(arr) { return [...arr].sort(()=>Math.random()-0.5); }
+    function syncUI() { document.getElementById('c-name').value = cfg.name; document.getElementById('c-exam').value = cfg.exam; document.getElementById('c-addr').value = cfg.addr; document.getElementById('i-mu').value = cfg.ins.mu; document.getElementById('i-me').value = cfg.ins.me; document.getElementById('i-su').value = cfg.ins.su; document.getElementById('i-se').value = cfg.ins.se; document.getElementById('i-lu').value = cfg.ins.lu; document.getElementById('i-le').value = cfg.ins.le; }
+    function saveCfg() { cfg.name = document.getElementById('c-name').value; cfg.exam = document.getElementById('c-exam').value; cfg.addr = document.getElementById('c-addr').value; cfg.ins = { mu: document.getElementById('i-mu').value, me: document.getElementById('i-me').value, su: document.getElementById('i-su').value, se: document.getElementById('i-se').value, lu: document.getElementById('i-lu').value, le: document.getElementById('i-le').value }; localStorage.setItem('bise_v61_cfg', JSON.stringify(cfg)); alert("Configuration saved!"); }
+    function uploadLogo(input) { const r = new FileReader(); r.onload = (e) => { cfg.logo = e.target.result; saveCfg(); document.getElementById('logo-status').innerHTML = "✅ Logo ready"; }; if(input.files[0]) r.readAsDataURL(input.files[0]); }
+    
+    document.getElementById('mixing-mode').addEventListener('change', (e) => {
+        const isMixing = e.target.value === 'with';
+        document.getElementById('standard-fields').classList.toggle('hidden', isMixing);
+        document.getElementById('mixing-fields').classList.toggle('hidden', !isMixing);
+        if(isMixing && unitRows.length===0) addUnitRow();
+        else if(isMixing) refreshMixingUI();
+    });
+    
+    async function handleLogin() {
+        if(document.getElementById('pin-entry').value === "786605") {
+            document.getElementById('scr-auth').style.display = 'none';
+            document.getElementById('app-body').classList.remove('hidden');
+            await initDB();
+            const c = localStorage.getItem('bise_v61_cfg');
+            if(c) cfg = JSON.parse(c);
+            syncUI();
+            currentData = await loadFromIndexedDB();
+            await updateStatsAndDropdowns();
+            attachClassSubjectListeners();
+        } else alert("Invalid PIN (Default: 786605)");
+    }
+</script>
+</body>
+</html>
