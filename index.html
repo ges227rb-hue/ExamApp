@@ -379,7 +379,7 @@
 <div id="scr-auth" class="fade-in" style="position:fixed; inset:0; background:#fff; z-index:9000; display:flex; align-items:center; justify-content:center;">
     <div class="card" style="width: 85%; max-width: 380px; text-align: center;">
         <i class="fas fa-chalkboard-user fa-3x" style="color:var(--primary); margin-bottom:15px;"></i>
-        <h2>📚 BISE Exam Portal</h2>
+        <h2>📚 GES227RB Exam Portal</h2>
         <p style="margin:10px 0;">Secure Access</p>
         <input id="pin-entry" type="password" placeholder="PIN: ######" style="margin-top:20px; text-align:center; font-size:20px; letter-spacing:5px;">
         <button onclick="handleLogin()" class="btn-main" style="margin-top:20px;"><i class="fas fa-key"></i> Enter Dashboard</button>
@@ -388,7 +388,7 @@
 
 <div id="app-body" class="hidden">
     <header>
-        <div style="font-weight:800; font-size:1.2rem;">📖 GES 227 EXAM MASTER v6.3</div>
+        <div style="font-weight:800; font-size:1.2rem;">📖 GES227RB EXAM MASTER v6.3</div>
         <button onclick="location.reload()" style="background:none; border:none; color:white; font-size:1.3rem;"><i class="fas fa-power-off"></i></button>
     </header>
 
@@ -793,7 +793,7 @@
         if(shorts.length){ html += `<div class="instruction ${langClass}">${getIns('s')}</div>`; shorts.forEach((q,i)=> html += `<div class="q-row ${langClass}"><div class="q-num">${i+1}.</div><div class="q-body">${q.q}</div><div style="font-weight:bold;">(${f.sM})</div></div>`); }
         if(longs.length){ html += `<div class="instruction ${langClass}" style="margin-top:10px;">${getIns('l')}</div>`; longs.forEach((q,i)=> html += `<div class="q-row ${langClass}"><div class="q-num">تفصیلی سوال ${i+1}:</div><div class="q-body">${q.q}</div><div style="font-weight:bold;">(${f.lM})</div></div>`); }
         html += `<footer class="pdf-footer">${cfg.addr}</footer></div><div class="pdf-page page-break"><div class="bise-header-box"><div class="school-title">🔐 جوابی کلید / ANSWER KEY</div><div>${f.sub} - جماعت ${f.cls}</div></div><div style="direction:${f.lang==='Ur'?'rtl':'ltr'}"><div style="font-weight:bold;">✅ معروضی جوابات:</div><div style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:15px 0;">${mcqs.map((q,i)=>`<div style="border:1px solid #ccc; padding:5px; text-align:center;">Q${i+1}: <b>${q.k}</b></div>`).join('')}</div>`;
-        if([...shorts,...longs].length){ html += `<div style="font-weight:bold; margin-top:20px;">📖 مختصر / تفصیلی جوابات کے لیے رہنما خطوط:</div>`; [...shorts,...longs].forEach((q,i)=> html += `<div style="font-size:12px; margin:8px 0; border-bottom:1px dotted #ddd;"><strong>Q${i+1}:</strong> ${q.k.substring(0,180)}${q.k.length>180?'...':''}</div>`); }
+        if([...shorts,...longs].length){ html += `<div style="font-weight:bold; margin-top:20px;">📖 مختصر / تفصیلی جوابات کے لیے رہنما خطوط:</div>`; [...shorts,...longs].forEach((q,i)=> html += `<div style="font-size:12px; margin:8px 0; border-bottom:1px dotted #ddd;"><strong>Q${i+1}:</strong> ${q.k.substring(0,180)}${q.k.length>180?'...':'|'}</div>`); }
         html += `</div></div>`;
         document.getElementById('print-content').innerHTML = html;
         window.lastMeta = f;
